@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCTV Checklist — IPAR Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:       #007AFF;
+    --blue-light: #E8F1FF;
+    --green:      #34C759;
+    --green-light:#E8F8EC;
+    --red:        #FF3B30;
+    --orange:     #FF9500;
+    --gray1:      #8E8E93;
+    --gray2:      #AEAEB2;
+    --gray3:      #C7C7CC;
+    --gray4:      #D1D1D6;
+    --gray5:      #E5E5EA;
+    --gray6:      #F2F2F7;
+    --bg:         #F2F2F7;
+    --card:       #FFFFFF;
+    --text:       #000000;
+    --text2:      #3C3C43;
+    --text3:      #8E8E93;
+    --separator:  rgba(60,60,67,0.12);
+    --radius:     16px;
+    --radius-sm:  10px;
+    --shadow:     0 2px 12px rgba(0,0,0,0.08);
+    --shadow-lg:  0 8px 30px rgba(0,0,0,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: rgba(242,242,247,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+    padding: 16px 20px 12px;
+    border-bottom: 0.5px solid var(--separator);
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 13px; font-weight: 600; color: var(--blue); letter-spacing: 0.02em; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; }
+  .header-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+
+  /* ── Segment Control ── */
+  .segment-wrap { padding: 12px 20px 0; }
+  .segment {
+    display: flex; background: var(--gray4);
+    border-radius: 10px; padding: 2px; gap: 2px;
+  }
+  .seg-btn {
+    flex: 1; padding: 7px 0; border: none; background: transparent;
+    font-size: 14px; font-weight: 500; color: var(--text3);
+    border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  }
+  .seg-btn.active {
+    background: #fff; color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.14);
+  }
+
+  /* ── Main ── */
+  .main { padding: 16px 20px 120px; max-width: 600px; margin: 0 auto; }
+
+  /* ── Meta card ── */
+  .meta-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow);
+  }
+  .meta-row { display: flex; gap: 12px; }
+  .meta-field { flex: 1; }
+  .meta-field label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px; }
+  .meta-field input {
+    width: 100%; background: var(--gray6); border: none;
+    border-radius: var(--radius-sm); padding: 8px 12px;
+    font-size: 15px; color: var(--text); outline: none;
+    font-family: inherit;
+  }
+  .meta-field input:focus { background: var(--blue-light); }
+
+  /* ── Progress ── */
+  .progress-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow);
+  }
+  .progress-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .progress-label { font-size: 14px; font-weight: 500; }
+  .progress-pct { font-size: 22px; font-weight: 700; color: var(--blue); }
+  .progress-track {
+    height: 8px; background: var(--gray5); border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--blue), var(--green));
+    transition: width 0.35s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-fill.done { background: var(--green); }
+
+  /* ── Section ── */
+  .section-card {
+    background: var(--card); border-radius: var(--radius);
+    margin-bottom: 12px; box-shadow: var(--shadow); overflow: hidden;
+  }
+  .section-header {
+    padding: 12px 16px; display: flex; align-items: center; gap: 8px;
+    border-bottom: 0.5px solid var(--separator);
+    background: var(--gray6);
+  }
+  .section-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .section-title { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; flex: 1; }
+  .section-count { font-size: 12px; color: var(--text3); }
+
+  /* ── Checklist items ── */
+  .check-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 16px; border-bottom: 0.5px solid var(--separator);
+    transition: background 0.15s; cursor: pointer;
+    position: relative;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:active { background: var(--gray6); }
+
+  .check-circle {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--gray3); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s cubic-bezier(.4,0,.2,1);
+    background: transparent;
+  }
+  .check-circle.checked {
+    background: var(--green); border-color: var(--green);
+  }
+  .check-circle.checked::after {
+    content: ''; display: block;
+    width: 6px; height: 10px;
+    border: 2px solid #fff; border-top: none; border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  .item-content { flex: 1; }
+  .item-text {
+    font-size: 15px; line-height: 1.4; color: var(--text);
+    transition: color 0.2s;
+  }
+  .item-text.done { color: var(--text3); text-decoration: line-through; }
+  .item-badge {
+    display: inline-block; margin-top: 3px;
+    font-size: 11px; font-weight: 600; padding: 2px 7px;
+    border-radius: 99px; letter-spacing: 0.03em;
+  }
+  .badge-blue  { background: var(--blue-light); color: var(--blue); }
+  .badge-green { background: var(--green-light); color: #1a7a33; }
+  .badge-orange { background: #FFF3E0; color: #c47400; }
+
+  .delete-btn {
+    background: none; border: none; color: var(--gray3); cursor: pointer;
+    font-size: 18px; padding: 4px; border-radius: 50%;
+    line-height: 1; display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s;
+  }
+  .delete-btn:hover { color: var(--red); }
+
+  /* ── Add item ── */
+  .add-item-row {
+    display: flex; gap: 8px; padding: 10px 16px;
+    border-top: 0.5px solid var(--separator);
+    background: var(--gray6);
+  }
+  .add-input {
+    flex: 1; background: #fff; border: 0.5px solid var(--gray4);
+    border-radius: var(--radius-sm); padding: 8px 12px;
+    font-size: 14px; color: var(--text); outline: none;
+    font-family: inherit;
+  }
+  .add-input:focus { border-color: var(--blue); }
+  .add-btn {
+    background: var(--blue); color: #fff; border: none;
+    border-radius: var(--radius-sm); padding: 8px 14px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .add-btn:active { opacity: 0.75; }
+
+  /* ── Notes ── */
+  .notes-card {
+    background: var(--card); border-radius: var(--radius);
+    margin-bottom: 12px; box-shadow: var(--shadow); overflow: hidden;
+  }
+  .notes-label {
+    padding: 12px 16px 0; font-size: 11px; font-weight: 600;
+    color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .notes-textarea {
+    width: 100%; background: transparent; border: none;
+    padding: 8px 16px 14px; font-size: 15px; color: var(--text);
+    font-family: inherit; resize: none; min-height: 80px; outline: none;
+  }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(242,242,247,0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid var(--separator);
+    padding: 12px 20px; padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    display: flex; gap: 10px;
+  }
+  .btn-reset {
+    flex: 1; padding: 12px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--red); background: transparent;
+    color: var(--red); font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .btn-reset:active { background: #fff0ef; }
+  .storage-info {
+    flex: 2; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--text3); text-align: center; line-height: 1.4;
+  }
+  .storage-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); margin-right: 5px; vertical-align: middle;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Animations ── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .section-card { animation: fadeIn 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <span class="logo">IPAR Solutions</span>
+    <span style="font-size:12px;color:var(--text3)" id="save-badge"></span>
+  </div>
+  <h1>Checklist CCTV</h1>
+  <div class="header-sub">Guía de instalación profesional</div>
+</div>
+
+<div class="segment-wrap">
+  <div class="segment">
+    <button class="seg-btn active" onclick="switchTab('ip')">📡 IP / NVR</button>
+    <button class="seg-btn" onclick="switchTab('analog')">📷 Analógica / DVR</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ═══ IP SCREEN ═══ -->
+  <div class="screen active" id="screen-ip">
+
+    <div class="meta-card">
+      <div class="meta-row">
+        <div class="meta-field">
+          <label>N° de cámaras</label>
+          <input type="number" id="ip-cams" placeholder="Ej: 8" oninput="save()">
+        </div>
+        <div class="meta-field">
+          <label>Fecha</label>
+          <input type="date" id="ip-date" oninput="save()">
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-label" id="ip-prog-text">0 de 0 pasos</span>
+        <span class="progress-pct" id="ip-prog-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="ip-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="ip-sections"></div>
+
+    <div class="notes-card">
+      <div class="notes-label">Observaciones</div>
+      <textarea class="notes-textarea" id="ip-notes" placeholder="Ej: cámara 3 requirió extensión de cable, cliente prefirió grabación por movimiento..." oninput="save()"></textarea>
+    </div>
+
+  </div>
+
+  <!-- ═══ ANALOG SCREEN ═══ -->
+  <div class="screen" id="screen-analog">
+
+    <div class="meta-card">
+      <div class="meta-row">
+        <div class="meta-field">
+          <label>N° de cámaras</label>
+          <input type="number" id="an-cams" placeholder="Ej: 4" oninput="save()">
+        </div>
+        <div class="meta-field">
+          <label>Fecha</label>
+          <input type="date" id="an-date" oninput="save()">
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-label" id="an-prog-text">0 de 0 pasos</span>
+        <span class="progress-pct" id="an-prog-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="an-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="an-sections"></div>
+
+    <div class="notes-card">
+      <div class="notes-label">Observaciones</div>
+      <textarea class="notes-textarea" id="an-notes" placeholder="Ej: señal débil en cámara 2 por longitud del cable, se instaló amplificador..." oninput="save()"></textarea>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <button class="btn-reset" onclick="resetCurrent()">Reiniciar</button>
+  <div class="storage-info" id="storage-info">
+    <span class="storage-dot"></span>Datos guardados por 7 días
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA DEFINITIONS
+═══════════════════════════════════════════ */
+const DATA = {
+  ip: {
+    sections: [
+      {
+        id: 'ip_plan', title: 'Planificación y medición',
+        icon: '📐', color: '#E8F1FF',
+        items: [
+          { id:'ip_p1', text:'Relevar el sitio y definir ubicación de cada cámara' },
+          { id:'ip_p2', text:'Medir y trazar el recorrido de cada cable UTP' },
+          { id:'ip_p3', text:'Verificar que el cable sea Cat5e o Cat6 mínimo' },
+        ]
+      },
+      {
+        id: 'ip_cable', title: 'Cableado',
+        icon: '🔌', color: '#FFF3E0',
+        items: [
+          { id:'ip_c1', text:'Instalar canaletas o pasar cable por ductos / paredes' },
+          { id:'ip_c2', text:'Crimpar RJ45 norma 568-B en ambos extremos', badge:'568-B', badgeClass:'badge-blue' },
+          { id:'ip_c3', text:'Probar con tester: verificar los 8 pines en ambos extremos', badge:'Tester', badgeClass:'badge-orange' },
+          { id:'ip_c4', text:'Etiquetar cada cable por número de cámara' },
+        ]
+      },
+      {
+        id: 'ip_cams', title: 'Instalación de cámaras',
+        icon: '📷', color: '#E8F8EC',
+        items: [
+          { id:'ip_ca1', text:'Montar soporte o caja de cada cámara' },
+          { id:'ip_ca2', text:'Conectar RJ45 a la cámara y asegurar correctamente' },
+          { id:'ip_ca3', text:'Ajustar ángulo de visión antes de fijar definitivamente' },
+        ]
+      },
+      {
+        id: 'ip_nvr', title: 'Instalación del NVR PoE',
+        icon: '🖥️', color: '#F3E8FF',
+        items: [
+          { id:'ip_n1', text:'Desarmar el NVR e instalar el disco duro (HDD de vigilancia)' },
+          { id:'ip_n2', text:'Conectar el NVR al router o switch PoE' },
+          { id:'ip_n3', text:'Conectar cables de cámaras a los puertos PoE del NVR' },
+          { id:'ip_n4', text:'Conectar monitor y mouse para configuración inicial' },
+        ]
+      },
+      {
+        id: 'ip_config', title: 'Configuración y pruebas',
+        icon: '⚙️', color: '#E8F8EC',
+        items: [
+          { id:'ip_cf1', text:'Verificar que el NVR detecte todas las cámaras' },
+          { id:'ip_cf2', text:'Configurar fecha, hora y nombre de cada canal' },
+          { id:'ip_cf3', text:'Formatear y configurar el HDD en el NVR' },
+          { id:'ip_cf4', text:'Configurar grabación continua o por movimiento' },
+          { id:'ip_cf5', text:'Configurar acceso remoto desde la app del fabricante', badge:'App móvil', badgeClass:'badge-blue' },
+          { id:'ip_cf6', text:'Verificar visualización en vivo desde la app' },
+          { id:'ip_cf7', text:'Probar reproducción de grabación del HDD' },
+        ]
+      }
+    ]
+  },
+  analog: {
+    sections: [
+      {
+        id: 'an_plan', title: 'Planificación y medición',
+        icon: '📐', color: '#E8F1FF',
+        items: [
+          { id:'an_p1', text:'Relevar el sitio y definir ubicación de cada cámara' },
+          { id:'an_p2', text:'Medir y trazar el recorrido de cada cable coaxial (RG59 o RG6)' },
+          { id:'an_p3', text:'Calcular longitud del cable de alimentación' },
+        ]
+      },
+      {
+        id: 'an_cable', title: 'Cableado',
+        icon: '🔌', color: '#FFF3E0',
+        items: [
+          { id:'an_c1', text:'Instalar canaletas o pasar cable por ductos / paredes' },
+          { id:'an_c2', text:'Instalar conectores BNC en ambos extremos del cable coaxial' },
+          { id:'an_c3', text:'Verificar continuidad con tester o multímetro', badge:'Tester', badgeClass:'badge-orange' },
+          { id:'an_c4', text:'Instalar cable de alimentación 18AWG o bornera 12V DC' },
+          { id:'an_c5', text:'Etiquetar cada cable por número de cámara' },
+        ]
+      },
+      {
+        id: 'an_cams', title: 'Instalación de cámaras',
+        icon: '📷', color: '#E8F8EC',
+        items: [
+          { id:'an_ca1', text:'Montar soporte o caja de cada cámara' },
+          { id:'an_ca2', text:'Conectar BNC de video y conector de alimentación 12V DC' },
+          { id:'an_ca3', text:'Ajustar ángulo de visión antes de fijar definitivamente' },
+        ]
+      },
+      {
+        id: 'an_dvr', title: 'Instalación del DVR',
+        icon: '🖥️', color: '#F3E8FF',
+        items: [
+          { id:'an_d1', text:'Instalar el disco duro (HDD de vigilancia) en el DVR' },
+          { id:'an_d2', text:'Conectar cables BNC a los canales de video del DVR' },
+          { id:'an_d3', text:'Conectar fuente de alimentación centralizada o individual' },
+          { id:'an_d4', text:'Conectar monitor y mouse para configuración inicial' },
+        ]
+      },
+      {
+        id: 'an_config', title: 'Configuración y pruebas',
+        icon: '⚙️', color: '#E8F8EC',
+        items: [
+          { id:'an_cf1', text:'Verificar que el DVR detecte señal en todos los canales' },
+          { id:'an_cf2', text:'Configurar fecha, hora y nombre de cada canal' },
+          { id:'an_cf3', text:'Formatear y configurar el HDD en el DVR' },
+          { id:'an_cf4', text:'Configurar resolución de grabación (1080p, 5MP, etc.)' },
+          { id:'an_cf5', text:'Configurar acceso remoto desde la app del fabricante', badge:'App móvil', badgeClass:'badge-blue' },
+          { id:'an_cf6', text:'Verificar visualización en vivo desde la app' },
+          { id:'an_cf7', text:'Probar reproducción de grabación del HDD' },
+        ]
+      }
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const STORAGE_KEY = 'cctv_checklist_v1';
+const EXPIRE_DAYS = 7;
+let state = { ip: {}, analog: {} };
+let currentTab = 'ip';
+
+/* ═══════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════ */
+function renderSections(type) {
+  const container = document.getElementById(type === 'ip' ? 'ip-sections' : 'an-sections');
+  const sections = DATA[type === 'ip' ? 'ip' : 'analog'].sections;
+  container.innerHTML = '';
+
+  sections.forEach(sec => {
+    // get items: base + any custom added
+    const customItems = (state[type].customItems && state[type].customItems[sec.id]) || [];
+    const allItems = [...sec.items, ...customItems];
+
+    const checkedCount = allItems.filter(it => state[type].checks && state[type].checks[it.id]).length;
+
+    const card = document.createElement('div');
+    card.className = 'section-card';
+
+    let itemsHTML = allItems.map(item => {
+      const checked = state[type].checks && state[type].checks[item.id];
+      const badgeHTML = item.badge
+        ? `<span class="item-badge ${item.badgeClass}">${item.badge}</span>`
+        : '';
+      const isCustom = customItems.find(ci => ci.id === item.id);
+      const delBtn = isCustom
+        ? `<button class="delete-btn" onclick="deleteItem(event,'${type}','${sec.id}','${item.id}')" title="Eliminar">✕</button>`
+        : '';
+      return `
+        <div class="check-item" onclick="toggleItem('${type}','${item.id}')">
+          <div class="check-circle ${checked ? 'checked' : ''}"></div>
+          <div class="item-content">
+            <div class="item-text ${checked ? 'done' : ''}">${item.text}</div>
+            ${badgeHTML}
+          </div>
+          ${delBtn}
+        </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="section-header">
+        <div class="section-icon" style="background:${sec.color}">${sec.icon}</div>
+        <span class="section-title">${sec.title}</span>
+        <span class="section-count">${checkedCount}/${allItems.length}</span>
+      </div>
+      ${itemsHTML}
+      <div class="add-item-row">
+        <input class="add-input" type="text" placeholder="Agregar paso..." id="add_${type}_${sec.id}"
+          onkeydown="if(event.key==='Enter') addItem('${type}','${sec.id}')">
+        <button class="add-btn" onclick="addItem('${type}','${sec.id}')">+ Agregar</button>
+      </div>`;
+
+    container.appendChild(card);
+  });
+}
+
+function renderAll() {
+  renderSections('ip');
+  renderSections('analog');
+  updateProgress('ip');
+  updateProgress('analog');
+}
+
+/* ═══════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════ */
+function countItems(type) {
+  const sections = DATA[type === 'ip' ? 'ip' : 'analog'].sections;
+  let total = 0, checked = 0;
+  sections.forEach(sec => {
+    const customItems = (state[type].customItems && state[type].customItems[sec.id]) || [];
+    const allItems = [...sec.items, ...customItems];
+    total += allItems.length;
+    allItems.forEach(it => { if (state[type].checks && state[type].checks[it.id]) checked++; });
+  });
+  return { total, checked };
+}
+
+function updateProgress(type) {
+  const { total, checked } = countItems(type);
+  const pct = total ? Math.round(checked / total * 100) : 0;
+  const bar = document.getElementById(type === 'ip' ? 'ip-bar' : 'an-bar');
+  const pctEl = document.getElementById(type === 'ip' ? 'ip-prog-pct' : 'an-prog-pct');
+  const txtEl = document.getElementById(type === 'ip' ? 'ip-prog-text' : 'an-prog-text');
+  bar.style.width = pct + '%';
+  bar.className = 'progress-fill' + (pct === 100 ? ' done' : '');
+  pctEl.textContent = pct + '%';
+  txtEl.textContent = checked + ' de ' + total + ' pasos';
+}
+
+/* ═══════════════════════════════════════════
+   ACTIONS
+═══════════════════════════════════════════ */
+function toggleItem(type, itemId) {
+  if (!state[type].checks) state[type].checks = {};
+  state[type].checks[itemId] = !state[type].checks[itemId];
+  renderSections(type);
+  updateProgress(type);
+  save();
+}
+
+function addItem(type, secId) {
+  const input = document.getElementById('add_' + type + '_' + secId);
+  const text = input.value.trim();
+  if (!text) return;
+  if (!state[type].customItems) state[type].customItems = {};
+  if (!state[type].customItems[secId]) state[type].customItems[secId] = [];
+  const newId = 'custom_' + Date.now();
+  state[type].customItems[secId].push({ id: newId, text });
+  input.value = '';
+  renderSections(type);
+  updateProgress(type);
+  save();
+}
+
+function deleteItem(e, type, secId, itemId) {
+  e.stopPropagation();
+  if (!state[type].customItems || !state[type].customItems[secId]) return;
+  state[type].customItems[secId] = state[type].customItems[secId].filter(i => i.id !== itemId);
+  if (state[type].checks) delete state[type].checks[itemId];
+  renderSections(type);
+  updateProgress(type);
+  save();
+}
+
+function switchTab(type) {
+  currentTab = type;
+  document.querySelectorAll('.seg-btn').forEach((b, i) =>
+    b.classList.toggle('active', (i === 0 && type === 'ip') || (i === 1 && type !== 'ip')));
+  document.getElementById('screen-ip').classList.toggle('active', type === 'ip');
+  document.getElementById('screen-analog').classList.toggle('active', type !== 'ip');
+}
+
+function resetCurrent() {
+  const type = currentTab;
+  if (!confirm('¿Reiniciar el checklist de ' + (type === 'ip' ? 'IP/NVR' : 'Analógica/DVR') + '?')) return;
+  state[type] = {};
+  document.getElementById(type === 'ip' ? 'ip-cams' : 'an-cams').value = '';
+  document.getElementById(type === 'ip' ? 'ip-notes' : 'an-notes').value = '';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById(type === 'ip' ? 'ip-date' : 'an-date').value = today;
+  renderSections(type);
+  updateProgress(type);
+  save();
+}
+
+/* ═══════════════════════════════════════════
+   PERSISTENCE — localStorage, expires 7 days
+═══════════════════════════════════════════ */
+function save() {
+  const ipNotes = document.getElementById('ip-notes').value;
+  const anNotes = document.getElementById('an-notes').value;
+  const ipCams  = document.getElementById('ip-cams').value;
+  const anCams  = document.getElementById('an-cams').value;
+  const ipDate  = document.getElementById('ip-date').value;
+  const anDate  = document.getElementById('an-date').value;
+
+  const payload = {
+    state,
+    meta: { ipNotes, anNotes, ipCams, anCams, ipDate, anDate },
+    savedAt: Date.now(),
+    expiresAt: Date.now() + EXPIRE_DAYS * 86400000
+  };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    const d = new Date(payload.expiresAt);
+    document.getElementById('save-badge').textContent =
+      'Guardado hasta ' + d.toLocaleDateString('es', { day:'numeric', month:'short' });
+  } catch(e) {}
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const payload = JSON.parse(raw);
+    if (Date.now() > payload.expiresAt) {
+      localStorage.removeItem(STORAGE_KEY);
+      document.getElementById('storage-info').innerHTML =
+        '<span style="color:var(--orange)">⚠️</span> Datos expirados, reiniciado';
+      return false;
+    }
+    state = payload.state || { ip: {}, analog: {} };
+    const m = payload.meta || {};
+    document.getElementById('ip-notes').value = m.ipNotes || '';
+    document.getElementById('an-notes').value = m.anNotes || '';
+    document.getElementById('ip-cams').value  = m.ipCams  || '';
+    document.getElementById('an-cams').value  = m.anCams  || '';
+    document.getElementById('ip-date').value  = m.ipDate  || '';
+    document.getElementById('an-date').value  = m.anDate  || '';
+    const d = new Date(payload.expiresAt);
+    document.getElementById('save-badge').textContent =
+      'Guardado hasta ' + d.toLocaleDateString('es', { day:'numeric', month:'short' });
+    return true;
+  } catch(e) { return false; }
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+(function init() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('ip-date').value = today;
+  document.getElementById('an-date').value = today;
+  if (!load()) {
+    state = { ip: {}, analog: {} };
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
